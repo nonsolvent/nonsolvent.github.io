@@ -2,55 +2,22 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>toastr.uk</title>
-
+<title>Globe Test</title>
 <style>
   html, body {
     margin: 0; padding: 0; height: 100%;
-    background: linear-gradient(100deg, #327da8, #917ee6);
-    background-size: 400% 400%;
-    animation: gradientAnimation 300s ease infinite;
-    font-family: 'Sawarabi Mincho', serif;
-    overflow: hidden;
+    background: #222; /* Dark background to see white outlines */
   }
-  @keyframes gradientAnimation {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-  
-  div.header {
-    font-size: 50px;
-    padding-top: 30px;
-    padding-bottom: 20px;
-  }
-  hr {
-    height: 2px;
-    border-width: 0;
-    color: black;
-    background-color: black;
-    margin: 0;
-  }
-  
   #globeViz {
-    position: fixed;
-    top: 0; left: 0;
     width: 100vw; height: 100vh;
-    pointer-events: none;
-    z-index: 0; /* behind the header */
-    background: transparent;
   }
   canvas {
     background-color: transparent !important;
-    display: block; /* removes inline gap */
+    display: block;
   }
 </style>
 </head>
 <body>
-
-<div class="header">Welcome to toaster web</div>
-<hr>
 <div id="globeViz"></div>
 
 <script src="https://unpkg.com/three@0.153.0/build/three.min.js"></script>
@@ -77,10 +44,9 @@
         .polygonCapColor(() => 'rgba(0,0,0,0)')
         .polygonSideColor(() => 'rgba(0,0,0,0)')
         .polygonStrokeColor(() => 'white')
-        .polygonAltitude(0.001);
+        .polygonAltitude(0.002);
     })
-    .catch(e => console.error('Failed to load continent data:', e));
+    .catch(e => console.error('Error loading continents:', e));
 </script>
-
 </body>
 </html>
