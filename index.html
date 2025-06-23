@@ -4,15 +4,22 @@
     <title>toastr.uk</title>
     <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet" />
 
-    <style>
+   <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      overflow: hidden;
+    }
     #globeViz {
-      position: absolute;
-      top: 0; left: 0;
       width: 100vw;
       height: 100vh;
       background: transparent;
     }
-    </style>
+    canvas {
+      background-color: transparent !important;
+    }
+  </style>
 </head>
   
   
@@ -48,33 +55,35 @@
 
   <script src="https://unpkg.com/three"></script>
   <script src="https://unpkg.com/globe.gl"></script>
+  <script src="https://unpkg.com/topojson@3"></script>
+
   <script>
-    const world = Globe()(document.getElementById('globeViz'));
+    // Force alpha transparency in renderer
+    const rendererConfig = {
+      alpha: true,
+      antialias: true
+    };
 
-    // Minimal settings
-    world
-      .globeImageUrl(null) // No Earth texture
-      .backgroundColor('rgba(0,0,0,0)') // Transparent background
-      .showGraticules(true) // Show latitude/longitude lines (optional)
-      .showAtmosphere(false) // No glowing atmosphere
-      .hexPolygonsData([]) // Clear polygons
-      .pointOfView({ lat: 0, lng: 0, altitude: 1.5 }, 0); // No zoom-in animation
+    const globe = Globe({ rendererConfig })(document.getElementById('globeViz'))
+      .globeImageUrl(null)
+      .backgroundColor(null) // don't set it here — null disables internal background
+      .showGraticules(false)
+      .showAtmosphere(false)
+      .pointOfView({ lat: 0, lng: 0, altitude: 1.5 }, 0);
 
-    // Add continent outlines (using built-in polygon layer)
-    fetch('https://unpkg.com/world-atlas/countries-110m.json')
+    // Load continent outlines only
+    fetch('https://unpkg.com/world-atlas@2/continents-110m.json')
       .then(res => res.json())
-      .then(countries => {
-        const { features } = window.topojson.feature(countries, countries.objects.countries);
-        world
-          .polygonsData(features)
-          .polygonCapColor(() => 'rgba(0,0,0,0)') // Transparent fill
-          .polygonSideColor(() => 'rgba(0,0,0,0)') // Transparent sides
-          .polygonStrokeColor(() => 'white') // Outline color
-          .polygonLabel(({ properties: d }) => d.name)
-          .polygonAltitude(0.001); // Very close to globe surface
+      .then(data => {
+        const continents = topojson.feature(data, data.objects.continents).features;
+        globe
+          .polygonsData(continents)
+          .polygonCapColor(() => 'rgba(0,0,0,0)')
+          .polygonSideColor(() => 'rgba(0,0,0,0)')
+          .polygonStrokeColor(() => 'white')
+          .polygonAltitude(0.001);
       });
   </script>
-  <script src="https://unpkg.com/topojson@3"></script>
 </body>
 
 </html>
