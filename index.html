@@ -1,52 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<title>Globe Test</title>
-<style>
-  html, body {
-    margin: 0; padding: 0; height: 100%;
-    background: #222; /* Dark background to see white outlines */
-  }
-  #globeViz {
-    width: 100vw; height: 100vh;
-  }
-  canvas {
-    background-color: transparent !important;
-    display: block;
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Visitor Location Globe</title>
+  <style>
+    html, body {
+      margin: 0;
+      background: transparent;
+      overflow: hidden;
+    }
+    #globeViz {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+    }
+  </style>
 </head>
 <body>
-<div id="globeViz"></div>
+  <div id="globeViz"></div>
 
-<script src="https://unpkg.com/three@0.153.0/build/three.min.js"></script>
-<script src="https://unpkg.com/globe.gl"></script>
-<script src="https://unpkg.com/topojson@3"></script>
+  <!-- Globe.gl and dependencies -->
+  <script src="https://unpkg.com/three"></script>
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script>
+    // Create globe
+    const world = Globe()
+      (document.getElementById('globeViz'))
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg') // Looks nice over dark bg
+      .backgroundColor('rgba(0,0,0,0)') // Transparent background
+      .pointOfView({ lat: 0, lng: 0, altitude: 2 }, 4000)
+      .showAtmosphere(true)
+      .atmosphereColor('#ffffff')
+      .atmosphereAltitude(0.25);
 
-<script>
-  const globe = Globe({
-    rendererConfig: { alpha: true, antialias: true }
-  })(document.getElementById('globeViz'));
-
-  globe
-    .globeImageUrl(null)
-    .backgroundColor(null)
-    .showGraticules(false)
-    .showAtmosphere(false)
-    .pointOfView({ lat: 0, lng: 0, altitude: 1.5 }, 0);
-
-  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/continent-110m.json')
-    .then(res => res.json())
-    .then(data => {
-      const continents = topojson.feature(data, data.objects.continents).features;
-      globe.polygonsData(continents)
-        .polygonCapColor(() => 'rgba(0,0,0,0)')
-        .polygonSideColor(() => 'rgba(0,0,0,0)')
-        .polygonStrokeColor(() => 'white')
-        .polygonAltitude(0.002);
-    })
-    .catch(e => console.error('Error loading continents:', e));
-</script>
+    // Get user location
+    navigator.geolocation.getCurrentPosition(position => {
+      const { latitude, longitude } = position.coords;
+      // Add marker to globe
+      world
+        .pointsData([{ lat: latitude, lng: longitude, size: 1, color: 'red' }])
+        .pointAltitude('size')
+        .pointColor('color');
+    }, () => {
+      alert('Unable to get location.');
+    });
+  </script>
 </body>
 </html>
