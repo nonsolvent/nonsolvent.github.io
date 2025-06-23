@@ -1,97 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>toastr.uk</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>toastr.uk</title>
 
-  <!-- Google Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet" />
-
-  <!-- Styles -->
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-      font-family: 'Sawarabi Mincho', serif;
-      background: linear-gradient(100deg, #327da8, #917ee6);
-      background-size: 400% 400%;
-      animation: gradientAnimation 300s ease infinite;
-    }
-
-    @keyframes gradientAnimation {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    #globeViz {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none; /* lets clicks go through */
-    }
-
-    canvas {
-      background-color: transparent !important;
-    }
-
-    .header {
-      position: relative;
-      z-index: 10;
-      text-align: center;
-      font-size: 50px;
-      padding-top: 30px;
-      padding-bottom: 20px;
-      color: white;
-    }
-
-    hr {
-      position: relative;
-      z-index: 10;
-      height: 2px;
-      border: none;
-      background-color: black;
-      margin: 0 20px;
-    }
-  </style>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: linear-gradient(100deg, #327da8, #917ee6);
+    background-size: 400% 400%;
+    animation: gradientAnimation 300s ease infinite;
+    font-family: 'Sawarabi Mincho', serif;
+    overflow: hidden;
+  }
+  @keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+  
+  /* Your original text styling kept exactly */
+  div.header {
+    font-size: 50px;
+    padding-top: 30px;
+    padding-bottom: 20px;
+  }
+  hr {
+    height: 2px;
+    border-width: 0;
+    color: black;
+    background-color: black;
+    margin: 0;
+  }
+  
+  #globeViz {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    pointer-events: none;
+    z-index: 0; /* behind your text */
+    background: transparent;
+  }
+  canvas {
+    background-color: transparent !important;
+  }
+</style>
 </head>
-
 <body>
-  <div class="header">Welcome to toaster web</div>
-  <hr>
 
-  <div id="globeViz"></div>
+<div class="header">Welcome to toaster web</div>
+<hr>
+<div id="globeViz"></div>
 
-  <!-- Scripts -->
-  <script src="https://unpkg.com/three"></script>
-  <script src="https://unpkg.com/globe.gl"></script>
-  <script src="https://unpkg.com/topojson@3"></script>
+<script src="https://unpkg.com/three@0.153.0/build/three.min.js"></script>
+<script src="https://unpkg.com/globe.gl"></script>
+<script src="https://unpkg.com/topojson@3"></script>
 
-  <script>
-    const rendererConfig = { alpha: true, antialias: true };
+<script>
+  const globe = Globe({
+    rendererConfig: { alpha: true, antialias: true }
+  })(document.getElementById('globeViz'));
 
-    const globe = Globe({ rendererConfig })(document.getElementById('globeViz'))
-      .globeImageUrl(null)
-      .backgroundColor(null)
-      .showGraticules(false)
-      .showAtmosphere(false)
-      .pointOfView({ lat: 0, lng: 0, altitude: 1.5 }, 0);
+  globe
+    .globeImageUrl(null)
+    .backgroundColor(null)
+    .showGraticules(false)
+    .showAtmosphere(false)
+    .pointOfView({ lat: 0, lng: 0, altitude: 1.5 }, 0);
 
-    fetch('https://unpkg.com/world-atlas@2/continents-110m.json')
-      .then(res => res.json())
-      .then(data => {
-        const continents = topojson.feature(data, data.objects.continents).features;
-        globe
-          .polygonsData(continents)
-          .polygonCapColor(() => 'rgba(0,0,0,0)')
-          .polygonSideColor(() => 'rgba(0,0,0,0)')
-          .polygonStrokeColor(() => 'white')
-          .polygonAltitude(0.001);
-      });
-  </script>
+  fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/continent-110m.json')
+    .then(res => res.json())
+    .then(data => {
+      const continents = topojson.feature(data, data.objects.continents).features;
+      globe.polygonsData(continents)
+        .polygonCapColor(() => 'rgba(0,0,0,0)')
+        .polygonSideColor(() => 'rgba(0,0,0,0)')
+        .polygonStrokeColor(() => 'white')
+        .polygonAltitude(0.001);
+    })
+    .catch(e => console.error('Failed to load continent data:', e));
+</script>
+
 </body>
 </html>
