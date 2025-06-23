@@ -1,7 +1,22 @@
 <html>
 <head>
-  <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet" />
-  <title>toastr.uk</title>
+    <meta charset="UTF-8">
+    <title>toastr.uk</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Mincho&display=swap" rel="stylesheet" />
+
+    <style>
+    #globeViz {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: transparent;
+    }
+    </style>
+</head>
+  
+  
+  
   <style>
     body {
       font-family: 'Sawarabi Mincho', serif;
@@ -24,12 +39,41 @@
       }
     }
   </style>
-  </body>
-    <div style='font-size: 60px; padding-top:30px; padding-bottom:20px'>Welcome to toaster web</div>
-    <hr style="height:2px;border-width:0;color:black;background-color:black"> 
-  </body>
   
-</head>
+  </body>
+    <div style='font-size: 50px; padding-top:30px; padding-bottom:20px'>Welcome to toaster web</div>
+    <hr style="height:2px;border-width:0;color:black;background-color:black"> 
+
+  <div id="globeViz"></div>
+
+  <!-- Globe.gl and dependencies -->
+  <script src="https://unpkg.com/three"></script>
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script>
+    // Create globe
+    const world = Globe()
+      (document.getElementById('globeViz'))
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg') // Looks nice over dark bg
+      .backgroundColor('rgba(0,0,0,0)') // Transparent background
+      .pointOfView({ lat: 0, lng: 0, altitude: 2 }, 4000)
+      .showAtmosphere(true)
+      .atmosphereColor('#ffffff')
+      .atmosphereAltitude(0.25);
+
+    // Get user location
+    navigator.geolocation.getCurrentPosition(position => {
+      const { latitude, longitude } = position.coords;
+      // Add marker to globe
+      world
+        .pointsData([{ lat: latitude, lng: longitude, size: 1, color: 'red' }])
+        .pointAltitude('size')
+        .pointColor('color');
+    }, () => {
+      alert('Unable to get location.');
+    });
+  </script>
+</body>
+
 </html>
 
 
