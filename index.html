@@ -3,7 +3,30 @@
   <title>toastr.uk</title>
   <body>
   <h1>Welcome to toaster web</h1>
+  <style>
+    body {
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(270deg, #ff0000, #0000ff);
+      background-size: 400% 400%;
+      animation: gradientAnimation 10s ease infinite;
+    }
+
+    @keyframes gradientAnimation {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+  </style>
 </body>
   
 </head>
 </html>
+
+
