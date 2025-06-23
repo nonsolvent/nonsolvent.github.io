@@ -46,32 +46,35 @@
 
   <div id="globeViz"></div>
 
-  <!-- Globe.gl and dependencies -->
   <script src="https://unpkg.com/three"></script>
   <script src="https://unpkg.com/globe.gl"></script>
   <script>
-    // Create globe
-    const world = Globe()
-      (document.getElementById('globeViz'))
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg') // Looks nice over dark bg
-      .backgroundColor('rgba(0,0,0,0)') // Transparent background
-      .pointOfView({ lat: 0, lng: 0, altitude: 2 }, 4000)
-      .showAtmosphere(true)
-      .atmosphereColor('#ffffff')
-      .atmosphereAltitude(0.25);
+    const world = Globe()(document.getElementById('globeViz'));
 
-    // Get user location
-    navigator.geolocation.getCurrentPosition(position => {
-      const { latitude, longitude } = position.coords;
-      // Add marker to globe
-      world
-        .pointsData([{ lat: latitude, lng: longitude, size: 1, color: 'red' }])
-        .pointAltitude('size')
-        .pointColor('color');
-    }, () => {
-      alert('Unable to get location.');
-    });
+    // Minimal settings
+    world
+      .globeImageUrl(null) // No Earth texture
+      .backgroundColor('rgba(0,0,0,0)') // Transparent background
+      .showGraticules(true) // Show latitude/longitude lines (optional)
+      .showAtmosphere(false) // No glowing atmosphere
+      .hexPolygonsData([]) // Clear polygons
+      .pointOfView({ lat: 0, lng: 0, altitude: 1.5 }, 0); // No zoom-in animation
+
+    // Add continent outlines (using built-in polygon layer)
+    fetch('https://unpkg.com/world-atlas/countries-110m.json')
+      .then(res => res.json())
+      .then(countries => {
+        const { features } = window.topojson.feature(countries, countries.objects.countries);
+        world
+          .polygonsData(features)
+          .polygonCapColor(() => 'rgba(0,0,0,0)') // Transparent fill
+          .polygonSideColor(() => 'rgba(0,0,0,0)') // Transparent sides
+          .polygonStrokeColor(() => 'white') // Outline color
+          .polygonLabel(({ properties: d }) => d.name)
+          .polygonAltitude(0.001); // Very close to globe surface
+      });
   </script>
+  <script src="https://unpkg.com/topojson@3"></script>
 </body>
 
 </html>
